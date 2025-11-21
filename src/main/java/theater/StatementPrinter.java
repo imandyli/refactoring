@@ -46,24 +46,44 @@ public class StatementPrinter {
      * @throws RuntimeException if one of the play types is not known
      */
     public String statement() {
-        int totalAmount = 0;
-        int volumeCredits = 0;
         final StringBuilder result =
                 new StringBuilder("Statement for " + invoice.getCustomer() + System.lineSeparator());
+
+        int totalAmount = 0;
+        for (final Performance performance : invoice.getPerformances()) {
+            totalAmount += getAmount(performance);
+        }
+
+        int volumeCredits = 0;
+        for (final Performance performance : invoice.getPerformances()) {
+            volumeCredits += getVolumeCredit(performance);
+        }
 
         for (final Performance performance : invoice.getPerformances()) {
             final Play play = getPlay(performance);
 
-            final int thisAmount = getAmount(performance);
-            volumeCredits += getVolumeCredit(performance);
-
-            result.append("  " + play.getName() + ": " + usdollar(thisAmount) + " ("
+            result.append("  " + play.getName() + ": " + usdollar(getAmount(performance)) + " ("
                     + performance.getAudience() + " seats)" + System.lineSeparator());
-            totalAmount += thisAmount;
         }
         result.append(String.format("Amount owed is %s%n", usdollar(totalAmount)));
         result.append(String.format("You earned %s credits%n", volumeCredits));
         return result.toString();
+    }
+
+    private int getTotalVolumeCredits() {
+        int result = 0;
+        for (final Performance performance : invoice.getPerformances()) {
+            result += getVolumeCredit(performance);
+        }
+        return result;
+    }
+
+    private int getTotalAmount() {
+        int result = 0;
+        for (final Performance performance : invoice.getPerformances()) {
+            result += getAmount(performance);
+        }
+        return result;
     }
 
     private String usdollar(int amount) {
