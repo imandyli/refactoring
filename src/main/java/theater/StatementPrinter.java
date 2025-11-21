@@ -56,16 +56,16 @@ public class StatementPrinter {
 
         int volumeCredits = 0;
         for (final Performance performance : invoice.getPerformances()) {
-            volumeCredits += getVolumeCredit(performance);
+            volumeCredits += getVolumeCredits(performance);
         }
 
         for (final Performance performance : invoice.getPerformances()) {
             final Play play = getPlay(performance);
 
-            result.append("  " + play.getName() + ": " + usdollar(getAmount(performance)) + " ("
+            result.append("  " + play.getName() + ": " + usd(getAmount(performance)) + " ("
                     + performance.getAudience() + " seats)" + System.lineSeparator());
         }
-        result.append(String.format("Amount owed is %s%n", usdollar(totalAmount)));
+        result.append(String.format("Amount owed is %s%n", usd(totalAmount)));
         result.append(String.format("You earned %s credits%n", volumeCredits));
         return result.toString();
     }
@@ -73,7 +73,7 @@ public class StatementPrinter {
     private int getTotalVolumeCredits() {
         int result = 0;
         for (final Performance performance : invoice.getPerformances()) {
-            result += getVolumeCredit(performance);
+            result += getVolumeCredits(performance);
         }
         return result;
     }
@@ -86,11 +86,11 @@ public class StatementPrinter {
         return result;
     }
 
-    private String usdollar(int amount) {
+    private String usd(int amount) {
         return NumberFormat.getCurrencyInstance(Locale.US).format(amount / Constants.PERCENT_FACTOR);
     }
 
-    private int getVolumeCredit(Performance performance) {
+    private int getVolumeCredits(Performance performance) {
         int result = 0;
         final Play play = getPlay(performance);
         result += Math.max(performance.getAudience() - Constants.BASE_VOLUME_CREDIT_THRESHOLD, 0);
