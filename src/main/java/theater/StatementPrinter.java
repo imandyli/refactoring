@@ -51,21 +51,23 @@ public class StatementPrinter {
         final StringBuilder result =
                 new StringBuilder("Statement for " + invoice.getCustomer() + System.lineSeparator());
 
-        final NumberFormat frmt = NumberFormat.getCurrencyInstance(Locale.US);
-
         for (final Performance performance : invoice.getPerformances()) {
             final Play play = getPlay(performance);
 
             final int thisAmount = getAmount(performance);
             volumeCredits += getVolumeCredit(performance);
 
-            result.append("  " + play.getName() + ": " + frmt.format(thisAmount / Constants.PERCENT_FACTOR
-            ) + " (" + performance.getAudience() + " seats)" + System.lineSeparator());
+            result.append("  " + play.getName() + ": " + usdollar(thisAmount) + " ("
+                    + performance.getAudience() + " seats)" + System.lineSeparator());
             totalAmount += thisAmount;
         }
-        result.append(String.format("Amount owed is %s%n", frmt.format(totalAmount / Constants.PERCENT_FACTOR)));
+        result.append(String.format("Amount owed is %s%n", usdollar(totalAmount)));
         result.append(String.format("You earned %s credits%n", volumeCredits));
         return result.toString();
+    }
+
+    private String usdollar(int amount) {
+        return NumberFormat.getCurrencyInstance(Locale.US).format(amount / Constants.PERCENT_FACTOR);
     }
 
     private int getVolumeCredit(Performance performance) {
